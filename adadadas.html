@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE CONTROLE DE ESTOQUE E ALERTA DE REPOSIÇÃO (MERCADINHO)</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        :root{
+            --cor-fundo: rgb(22, 22, 22);
+            --cor-secundária: rgb(163, 8, 8);
+            --cor-secundária2: rgb(182, 38, 38);
+            --cor-texto: white;
+        }
+        html, body{
+            background-image: url(img/fundo.avif);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .menu{
+            display: flex;
+            width: 100%;
+            max-height: 80px;
+            height: 100%;
+            background-color: var(--cor-fundo);
+            color: var(--cor-secundária);
+            flex-direction: row;
+            margin: 0;
+            align-items: center;
+        }
+        .menu a{
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            font-size: 2rem;
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+            text-decoration: none;
+            border: solid var(--cor-secundária) 2px;
+            border-radius: 5px;
+            margin: 1rem;
+            color: var(--cor-secundária);
+            transition: 200ms;
+        }
+        .menu a:hover{
+            font-size: 2.5rem;
+            padding-left: 3rem;
+            padding-right: 3rem;
+            border: solid var(--cor-secundária2) 2px;
+            color: var(--cor-secundária2);
+        } 
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        footer {
+            flex-shrink: 0;
+            width: 100%;
+            background-color: var(--cor-fundo);
+            border-top: 2px solid var(--cor-secundária);
+            padding: 15px 10px;
+            text-align: center;
+        }
+        footer p {
+            margin: 0 0 10px;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: var(--cor-secundária);
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .footer-links a {
+            color: var(--cor-secundária);
+            text-decoration: none;
+            padding: 0 12px;
+            border-right: 1px solid var(--cor-secundária);
+        }
+        .footer-links a:last-child {
+            border-right: none;
+        }
+        p {
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: var(--cor-secundária);
+            font-size: 100%;
+        }
+        .dados {
+            line-height: 1.6;
+            font-family: Arial, sans-serif;
+            font-size: 200%;
+        }
+        .dados strong {
+            color: var(--cor-secundária2);
+        }
+        
+        /* --- ESTILOS DOS CARDS --- */ 
+        .meu-painel-secao {
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .container-cards-estoque {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .card-dinamico {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            width: 220px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            word-wrap: break-word;
+        }
+        .card-dinamico-corpo img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .card-dinamico-corpo h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        .card-dinamico-corpo p {
+            margin: 0 0 5px 0;
+            color: #666;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+        }
+        .btn-card-excluir {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            width: 100%;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .btn-card-excluir:hover {
+            background-color: #bd2130;
+        }
+        .btn-card-editar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            width: 100%;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .btn-card-editar:hover {
+            background-color: #218838;
+        }
+        .card-dinamico-adicionar {
+            background-color: #e9ecef;
+            border: 2px dashed #999;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            min-height: 192px;
+        }
+        .card-dinamico-adicionar:hover {
+            background-color: #dee2e6;
+            border-color: #007bff;
+        }
+        .card-dinamico-adicionar .icone-mais-card {
+            font-size: 40px;
+            color: #6c757d;
+            font-weight: bold;
+            line-height: 1;
+            pointer-events: none; /* Garante que cliques no ícone passem para o card */
+        }
+        .card-dinamico-adicionar span {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+            font-weight: bold;
+            pointer-events: none; /* Garante que cliques no texto passem para o card */
+        }
+
+        /* Modal flutuante */
+        .modal-fundo-cards {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 9999;
+        }
+        .modal-fundo-cards.visivel {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .formulario-card-caixa {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .grupo-input-card {
+            margin-bottom: 15px;
+        }
+        .grupo-input-card label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .grupo-input-card input, .grupo-input-card textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .botoes-form-card {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn-form-acao {
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            font-weight: bold;
+        }
+        .btn-form-salvar { background-color: #007bff; color: white; }
+        .btn-form-cancelar { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="rounded gradient bg-dark menu">
+            <a href="">menu de gerenciamento</a>  
+            <a href="">contato</a>
+            <a href="">ver gráfico</a> 
+            <a href="">conta/empresa</a>
+        </div>
+        <div class="dados">
+            <p style="text-align: center;">Bem-vindo <span id="nomeUsuario">visitante</span>!</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="meu-painel-secao">
+            <div id="lista-de-cards-estoque" class="container-cards-estoque">
+                <div id="btn-abrir-form-card" class="card-dinamico card-dinamico-adicionar">
+                    <div class="icone-mais-card">+</div>
+                    <span>Criar Novo Card</span>
+                </div>
+            </div>
+        </section>
+
+        <div id="modal-formulario-cards" class="modal-fundo-cards">
+            <form id="formulario-de-cards" class="formulario-card-caixa">
+                <input type="hidden" id="card-index-editando" value="">
+                <h3 id="modal-titulo" style="margin-top:0; font-size:1.2rem; color:#333;">Adicionar Novo Item</h3>
+                <div class="grupo-input-card">
+                    <label for="input-card-titulo">Nome do Item/Alerta:</label>
+                    <input type="text" id="input-card-titulo" placeholder="Ex: Arroz" required>
+                </div>
+                <div class="grupo-input-card">
+                    <label for="input-card-descricao">Observação:</label>
+                    <textarea id="input-card-descricao" rows="3" placeholder="Ex: Fornecedor entrega na terça..." required></textarea>
+                </div>
+                <div class="grupo-input-card">
+                    <label for="atual">Estoque Atual:</label>
+                    <input type="number" id="atual" placeholder="100" required>
+                </div>
+                <div class="grupo-input-card">
+                    <label for="consum">Consumo por dia:</label>
+                    <input type="number" id="consum" placeholder="14" required>
+                </div>
+                <div class="grupo-input-card">
+                    <label for="link">Foto do Produto (Opcional):</label>
+                    <input type="file" id="link" accept="image/*">
+                </div>
+                <div class="botoes-form-card">
+                    <button type="button" id="btn-fechar-form-card" class="btn-form-acao btn-form-cancelar">Cancelar</button>
+                    <button type="submit" id="btn-submit-form" class="btn-form-acao btn-form-salvar">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>SISTEMA DE CONTROLE DE ESTOQUE</p>
+        <div class="footer-links">
+            <a href="index.html">Início</a>
+            <a href="#">Contato</a>
+            <a href="#">Ajuda</a>
+            <a href="#">Conta</a>
+        </div>
+    </footer>
+
+    <script>
+        const usuarioSalvo = localStorage.getItem('usuario');
+        const elementoNome = document.getElementById("nomeUsuario");
+
+        if (usuarioSalvo && elementoNome) {
+            try {
+                const usuario = JSON.parse(usuarioSalvo);
+                if (usuario && usuario.nome) {
+                    elementoNome.textContent = usuario.nome;
+                }
+            } catch (e) {
+                console.error('Erro ao ler usuário:', e);
+            }
+        }
+
+        (function() {
+            const btnAbrir = document.getElementById('btn-abrir-form-card');
+            const btnFechar = document.getElementById('btn-fechar-form-card');
+            const modalCards = document.getElementById('modal-formulario-cards');
+            const formCards = document.getElementById('formulario-de-cards');
+            const containerLista = document.getElementById('lista-de-cards-estoque');
+            const inputIndexEditando = document.getElementById('card-index-editando');
+            const modalTitulo = document.getElementById('modal-titulo');
+            const btnSubmitForm = document.getElementById('btn-submit-form');
+
+            const STORAGE_KEY = 'estoque_mercandinho_items';
+
+            function carregarCards() {
+                const itensSalvos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                
+                const cardsAntigos = containerLista.querySelectorAll('.card-dinamico:not(#btn-abrir-form-card)');
+                cardsAntigos.forEach(c => c.remove());
+
+                itensSalvos.forEach((item, index) => {
+                    criarCardElemento(item, index);
+                });
+            }
+
+            function salvarNoStorage(novoItem, index = null) {
+                let itensSalvos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                if (index !== null && index !== "" && index >= 0) {
+                    itensSalvos[index] = novoItem; 
+                } else {
+                    itensSalvos.push(novoItem); 
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(itensSalvos));
+            }
+
+            function removerDoStorage(index) {
+                let itensSalvos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                itensSalvos.splice(index, 1);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(itensSalvos));
+                carregarCards();
+            }
+
+            function criarCardElemento(item, index) {
+                const consumo_mes = item.consumo * 30;
+                let alerta = "";
+                let corAlerta = "";
+
+                if (consumo_mes > 0) {
+                    if (item.atual > consumo_mes) {
+                        alerta = "Suficiente para o mês";
+                        corAlerta = "green"; 
+                    } else {
+                        alerta = "Atenção: Estoque insuficiente!";
+                        corAlerta = "red";   
+                    }
+                }
+
+                const novoCardElemento = document.createElement('div');
+                novoCardElemento.classList.add('card-dinamico');
+                novoCardElemento.innerHTML = `
+                    <div class="card-dinamico-corpo">
+                        ${item.imagemSrc ? `<img src="${item.imagemSrc}" alt="${item.titulo}">` : ''}
+                        <h3>Nome: ${item.titulo}</h3>
+                        <p>Estoque atual: ${item.atual}</p>
+                        <p>Mínimo (mês): ${consumo_mes}</p>
+                        <p>Descrição: ${item.descricao}</p>
+                        <p style="color: ${corAlerta}; font-weight: bold;">${alerta}</p>
+                    </div>
+                    <button class="btn-card-editar" type="button" data-index="${index}">Editar</button>
+                    <button class="btn-card-excluir" type="button" data-index="${index}">Excluir</button>
+                `;
+
+                novoCardElemento.querySelector('.btn-card-excluir').addEventListener('click', () => {
+                    if (confirm("Deseja realmente excluir este item?")) {
+                        removerDoStorage(index);
+                    }
+                });
+
+                novoCardElemento.querySelector('.btn-card-editar').addEventListener('click', () => {
+                    inputIndexEditando.value = index;
+                    document.getElementById('input-card-titulo').value = item.titulo;
+                    document.getElementById('input-card-descricao').value = item.descricao;
+                    document.getElementById('atual').value = item.atual;
+                    document.getElementById('consum').value = item.consumo;
+                    
+                    modalTitulo.textContent = "Editar Item de Estoque";
+                    btnSubmitForm.textContent = "Salvar Alterações";
+                    modalCards.classList.add('visivel');
+                });
+
+                containerLista.insertBefore(novoCardElemento, btnAbrir);
+            }
+
+            if (btnAbrir && btnFechar && modalCards && formCards && containerLista) {
+                // Evento para abrir o modal de cadastro garantindo o funcionamento do clique
+                btnAbrir.addEventListener('click', () => {
+                    formCards.reset();
+                    inputIndexEditando.value = "";
+                    modalTitulo.textContent = "Adicionar Novo Item";
+                    btnSubmitForm.textContent = "Adicionar";
+                    modalCards.classList.add('visivel');
+                });
+                
+                btnFechar.addEventListener('click', () => {
+                    modalCards.classList.remove('visivel');
+                    formCards.reset();
+                    inputIndexEditando.value = "";
+                });
+
+                modalCards.addEventListener('click', (e) => {
+                    if (e.target === modalCards) {
+                        modalCards.classList.remove('visivel');
+                        formCards.reset();
+                        inputIndexEditando.value = "";
+                    }
+                });
+
+                formCards.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const txtTitulo = document.getElementById('input-card-titulo').value;
+                    const txtDescricao = document.getElementById('input-card-descricao').value;
+                    const atual = Number(document.getElementById('atual').value);
+                    const consumo = Number(document.getElementById('consum').value);
+                    const inputArquivo = document.getElementById('link');
+                    const indexEditando = inputIndexEditando.value;
+
+                    function finalizarProcessamento(imagemFinal) {
+                        const itensSalvos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                        
+                        let imagemSrc = imagemFinal;
+                        if (!imagemSrc && indexEditando !== "") {
+                            imagemSrc = itensSalvos[indexEditando] ? itensSalvos[indexEditando].imagemSrc : null;
+                        }
+
+                        const dadosItem = {
+                            titulo: txtTitulo,
+                            descricao: txtDescricao,
+                            atual: atual,
+                            consumo: consumo,
+                            imagemSrc: imagemSrc || null
+                        };
+
+                        if (indexEditando !== "") {
+                            salvarNoStorage(dadosItem, Number(indexEditando));
+                        } else {
+                            salvarNoStorage(dadosItem);
+                        }
+
+                        carregarCards();
+                        modalCards.classList.remove('visivel');
+                        formCards.reset();
+                        inputIndexEditando.value = "";
+                    }
+
+                    if (inputArquivo.files && inputArquivo.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            finalizarProcessamento(e.target.result);
+                        };
+                        reader.readAsDataURL(inputArquivo.files[0]);
+                    } else {
+                        finalizarProcessamento(null);
+                    }
+                });
+            }
+
+            carregarCards();
+        })();
+    </script>
+</body>
+</html>

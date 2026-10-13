@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE CONTROLE DE ESTOQUE E ALERTA DE REPOSIÇÃO(MERCADINHO)</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+    :root {
+        --cor-fundo: rgb(22, 22, 22);
+        --cor-secundária: rgb(163, 8, 8);
+        --cor-secundária2: rgb(182, 38, 38);
+        --cor-texto: #f2f2f2;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        min-height: 100%;
+    }
+
+    body {
+        min-height: 100vh;
+        background-image: url(img/fundo.avif);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        display: flex;
+        flex-direction: column;
+        color: var(--cor-texto);
+    }
+
+    header {
+        flex-shrink: 0;
+    }
+
+    .menu {
+        display: flex;
+        width: 100%;
+        min-height: 80px;
+        background-color: var(--cor-fundo);
+        color: var(--cor-secundária);
+        flex-direction: row;
+        margin: 0;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 8px;
+    }
+
+    .menu a {
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        font-size: 1.5rem;
+        padding: 8px 20px;
+        text-decoration: none;
+        border: solid var(--cor-secundária) 2px;
+        border-radius: 5px;
+        margin: 6px;
+        color: var(--cor-secundária);
+        transition: 200ms;
+    }
+
+    .menu a:hover {
+        font-size: 1.65rem;
+        border-color: var(--cor-secundária2);
+        color: var(--cor-secundária2);
+        text-shadow: 0 0 10px var(--cor-secundária2);
+    }
+
+    main {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .tela {
+        width: 100%;
+        max-width: 430px;
+        background-color: rgba(22, 22, 22, 0.94);
+        border: double var(--cor-secundária) 3px;
+        border-radius: 10px;
+        box-shadow:
+            0 0 8px var(--cor-secundária),
+            0 0 20px rgba(163, 8, 8, 0.45);
+        padding: 30px;
+    }
+
+    .tela h1,
+    .tela h2 {
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        color: var(--cor-secundária);
+        text-align: center;
+        margin-top: 0;
+        text-shadow: 0 0 10px rgba(163, 8, 8, 0.5);
+    }
+
+    .tela label {
+        display: block;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        color: var(--cor-secundária);
+        margin: 12px 0 5px;
+    }
+
+    .tela input {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        color: var(--cor-texto);
+        background-color: #111;
+        border: solid var(--cor-secundária) 2px;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    .tela input:focus {
+        border-color: var(--cor-secundária2);
+        box-shadow: 0 0 10px rgba(182, 38, 38, 0.6);
+    }
+
+    .botao-principal {
+        display: block;
+        width: 100%;
+        max-width: none;
+        min-height: 45px;
+        margin: 22px 0 12px;
+        padding: 8px 15px;
+        border: 3px double black;
+        border-radius: 5px;
+        background-color: var(--cor-fundo);
+        color: var(--cor-secundária);
+        box-shadow: 0 0 8px var(--cor-secundária);
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        cursor: pointer;
+        transition: 200ms;
+    }
+
+    .botao-principal:hover {
+        color: white;
+        border-color: var(--cor-secundária2);
+        box-shadow: 0 0 15px var(--cor-secundária2);
+    }
+
+    .link-acao {
+        display: block;
+        text-align: center;
+        color: var(--cor-secundária);
+        cursor: pointer;
+        text-decoration: underline;
+        font-family: Arial, sans-serif;
+        margin-top: 12px;
+    }
+
+    .link-acao:hover {
+        color: var(--cor-secundária2);
+    }
+
+    .mensagem {
+        display: none;
+        text-align: center;
+        padding: 10px;
+        margin-top: 12px;
+        border: 1px solid var(--cor-secundária);
+        border-radius: 5px;
+        color: white;
+        background-color: rgba(163, 8, 8, 0.25);
+        font-family: Arial, sans-serif;
+    }
+
+    .dados {
+        line-height: 1.6;
+        font-family: Arial, sans-serif;
+    }
+
+    .dados strong {
+        color: var(--cor-secundária2);
+    }
+
+    footer {
+        flex-shrink: 0;
+        width: 100%;
+        background-color: var(--cor-fundo);
+        border-top: 2px solid var(--cor-secundária);
+        padding: 15px 10px;
+        text-align: center;
+    }
+
+    footer p {
+        margin: 0 0 10px;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        color: var(--cor-secundária);
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .footer-links a {
+        color: var(--cor-secundária);
+        text-decoration: none;
+        padding: 0 12px;
+        border-right: 1px solid var(--cor-secundária);
+    }
+
+    .footer-links a:last-child {
+        border-right: none;
+    }
+
+    @media (max-width: 600px) {
+        .menu a {
+            font-size: 1rem;
+            padding: 7px 10px;
+            margin: 3px;
+        }
+
+        .menu a:hover {
+            font-size: 1.05rem;
+        }
+
+        main {
+            padding: 25px 12px;
+        }
+
+        .tela {
+            padding: 22px;
+        }
+
+        .footer-links a {
+            padding: 0 8px;
+        }
+    }
+</style>
+    
+</head>
+<body>
+
+ 
+
+    <header>
+        <nav class="menu">
+            <a href="#" onclick="mostrarPainel(event)">INÍCIO</a>
+            <a href="#" onclick="mostrarPainel(event)">GERENCIAMENTO</a>
+            <a href="#" onclick="mostrarPainel(event)">GRÁFICOS</a>
+            <a href="#" onclick="mostrarConta(event)">CONTA</a>
+        </nav>
+    </header>
+
+    <main>
+
+      
+        <section id="telaLogin" class="tela">
+            <h1>ENTRAR NO SISTEMA</h1>
+
+            <form id="formLogin">
+                <label for="emailLogin">E-mail:</label>
+                <input type="email" id="emailLogin" required>
+
+                <label for="senhaLogin">Senha:</label>
+                <input type="password" id="senhaLogin" required>
+
+                <button type="submit" class="botao-principal">
+                    ENTRAR
+                </button>
+            </form>
+
+            <span class="link-acao" onclick="mostrarCadastro()">
+                Ainda não possui cadastro? Cadastre-se
+            </span>
+
+            <div id="erroLogin" class="mensagem"></div>
+        </section>
+
+        <!-- TELA DE CADASTRO -->
+        <section id="telaCadastro" class="tela" style="display: none;">
+            <h2>CRIAR CADASTRO</h2>
+
+            <form id="formCadastro">
+                <label for="nomeCadastro">Nome:</label>
+                <input type="text" id="nomeCadastro" required>
+
+                <label for="emailCadastro">E-mail:</label>
+                <input type="email" id="emailCadastro" required>
+
+                <label for="senhaCadastro">Senha:</label>
+                <input type="password" id="senhaCadastro" required>
+
+                <label for="senhaConfirmacao">Confirme a senha:</label>
+                <input type="password" id="senhaConfirmacao" required>
+
+                <button type="submit" class="botao-principal">
+                    CADASTRAR
+                </button>
+            </form>
+
+            <span class="link-acao" onclick="mostrarLogin()">
+                Já possui cadastro? Entrar
+            </span>
+
+            <div id="mensagemCadastro" class="mensagem"></div>
+        </section>
+
+        <!-- PAINEL APÓS O LOGIN -->
+        <section id="telaSistema" class="tela" style="display: none;">
+            <h2>PAINEL DO SISTEMA</h2>
+
+            <div class="dados">
+                <p>Bem-vindo, <strong id="nomeUsuario"></strong>!</p>
+                <p>E-mail: <strong id="emailUsuario"></strong></p>
+                <hr>
+                <p>
+                    Esta é a primeira versão do sistema.
+                    Futuramente, este painel poderá receber o
+                    controle de vendas, estoque e os alertas de
+                    nível crítico.
+                </p>
+            </div>
+
+            <button type="button" class="botao-principal" onclick="sair()">
+                SAIR
+            </button>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>SISTEMA DE CONTROLE DE ESTOQUE</p>
+
+        <div class="footer-links">
+            <a href="#">Início</a>
+            <a href="#">Contato</a>
+            <a href="#">Ajuda</a>
+            <a href="#">Conta</a>
+        </div>
+    </footer>
+
+    <script>
+        /*
+         * Nesta primeira versão, os dados ficam no localStorage apenas
+         * para permitir o funcionamento do protótipo no navegador.
+         * Para um sistema real, a senha NÃO deve ser armazenada assim.
+         */
+
+        function mostrarCadastro() {
+            document.getElementById("telaLogin").style.display = "none";
+            document.getElementById("telaCadastro").style.display = "block";
+            document.getElementById("telaSistema").style.display = "none";
+        }
+
+        function mostrarLogin() {
+            document.getElementById("telaCadastro").style.display = "none";
+            document.getElementById("telaLogin").style.display = "block";
+            document.getElementById("telaSistema").style.display = "none";
+        }
+
+        function mostrarPainel(event) {
+            if (event) event.preventDefault();
+
+            const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+            if (!usuario) {
+                mostrarLogin();
+                return;
+            }
+
+            mostrarSistema(usuario);
+        }
+
+        function mostrarConta(event) {
+            if (event) event.preventDefault();
+
+            const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+            if (!usuario) {
+                mostrarLogin();
+                return;
+            }
+
+            mostrarSistema(usuario);
+        }
+
+        function mostrarSistema(usuario) {
+            document.getElementById("telaLogin").style.display = "none";
+            document.getElementById("telaCadastro").style.display = "none";
+            document.getElementById("telaSistema").style.display = "block";
+
+            document.getElementById("nomeUsuario").textContent = usuario.nome;
+            document.getElementById("emailUsuario").textContent = usuario.email;
+        }
+
+        document.getElementById("formCadastro").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nomeCadastro").value.trim();
+            const email = document.getElementById("emailCadastro").value.trim();
+            const senha = document.getElementById("senhaCadastro").value;
+            const confirmacao = document.getElementById("senhaConfirmacao").value;
+            const mensagem = document.getElementById("mensagemCadastro");
+
+            if (senha !== confirmacao) {
+                mensagem.textContent = "As senhas não coincidem.";
+                mensagem.style.display = "block";
+                return;
+            }
+
+            const usuario = {
+                nome: nome,
+                email: email,
+                senha: senha
+            };
+
+            localStorage.setItem("usuario", JSON.stringify(usuario));
+
+            mensagem.textContent = "Cadastro realizado! Agora faça o login.";
+            mensagem.style.display = "block";
+
+            setTimeout(function() {
+                mensagem.style.display = "none";
+                mostrarLogin();
+                document.getElementById("emailLogin").value = email;
+            }, 1200);
+        });
+
+        document.getElementById("formLogin").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("emailLogin").value.trim();
+            const senha = document.getElementById("senhaLogin").value;
+            const usuario = JSON.parse(localStorage.getItem("usuario"));
+            const mensagem = document.getElementById("erroLogin");
+
+            if (!usuario) {
+                mensagem.textContent = "Nenhum cadastro encontrado. Cadastre-se primeiro.";
+                mensagem.style.display = "block";
+                return;
+            }
+
+            if (email === usuario.email && senha === usuario.senha) {
+                mensagem.style.display = "none";
+                mostrarSistema(usuario);
+            } else {
+                mensagem.textContent = "E-mail ou senha incorretos.";
+                mensagem.style.display = "block";
+            }
+        });
+
+        function sair() {
+            document.getElementById("telaSistema").style.display = "none";
+            document.getElementById("telaLogin").style.display = "block";
+            document.getElementById("formLogin").reset();
+        }
+    </script>
+
+</body></body>
+</html>
